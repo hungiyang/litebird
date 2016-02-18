@@ -1,0 +1,175 @@
+2015-01-06, Litebird simulation tutorial
+
+i) Git access
+
+1) https://tskisner.github.io/litebird-tools/programs.html
+
+lb_sim
+gives hits_map, and 3x3 matrix
+
+(with HWP, always get great results)
+
+2) focal plane (https://tskisner.github.io/litebird-tools/focalplane.html)
+function: lb.create_LFT_nominal
+- create the focal plane and orient the detectors, frequncies
+
+For noise time streams and map-making examples
+
+ii) NERSC account
+- changing shells to bash
+-- nim.nersc.gov: logins by host
+
+- edit global shell resource file for cori
+-- home dir: 
+-- vi .bashrc.ext
+-- global .bashrc (which sources on all machines) that sources the .bashrc_ext
+-- copy and paste the if lines and paste [if NERSC_HOST == "cori"]:
+    module use /global/cscratch1/sd/kisner/software/modulefiles
+-- this makes the modules available
+
+
+log into cori:
+try
+-- module load pytoast
+to test it out
+
+: NX clients:
+: nx.nersc.gov (Have the NX config files on the nersc website)
+
+Checkout Litebird tools
+- git checkout
+(in development mode, so that don't need to recompile at every new checkout)
+
+- install on scratch space, (and then setup cronjob to touch it so that it doesn't get deleted)
+
+- cd $SCRATCH (is my scratch directory)
+- mkdir software
+- mkdir git
+- mkdir litebird
+- cd git
+- git clone https://kimmywu@github.com/tskisner/litebird-tools.git
+- 
+- cp the setup.sh in /global/cscratch1/sd/kisner/software/litebird/ to my own litebird install directory $SCRATCH/software/litebird/
+( this setup.sh setup the PYTHONPATH)
+( change the setup.sh to point to my own prefix)
+
+- source setup.sh
+
+( can write script as in Ted's .bashrc.ext to short cut 
+module load pytoast
+. $(SCRATCH)/.../setup.sh
+) in my own .bashrc.ext (so can just type e.g. litebird to setup environment
+DONE
+now type
+> litebird and the setup.sh will be sourced
+
+
+----
+> module list
+includes env-python-3.4/gcc-4.9_mkl-16
+ls kisner/software/litebird/python-3.4.../lib/python/site-packages
+are the packages included, e.g.
+astropy
+healpy
+mpi4py
+etc.etc
+
+python setup.py DEVELOP --prefix==...
+
+the DEVELOP creates a .egg that links back to the git checkout version
+
+-------->>>>> look up what develop vs install
+
+there are two main sim scripts
+1) pointing sims
+- all dets have equal weighting
+- does not depend not toast
+- focalplane
+
+2) noise sim
+- depend on toast
+- use high level focalplane scripts
+
+Params one might what to tweak:
+documentation: http://tskisner.github.io/litebird-tools/programs.html
+obs  (hours of observation)
+gap ( hours of fridge cycle)
+numobs (number of observations)
+
+There are 3 ready-made focal planes
+i) nominal, ii) mirror, iii) radial
+
+PSM output maps, beam smoothed to litebird resolution, freq. are delta functions
+Maps are saved at
+/project/projectdirs/litebird/data/phaseA/sim01/
+NSIDE=1024
+
+> salloc 
+gets a node for 10 minutes
+
+Run
+> litebird
+> python3
+---
+py3 > import toast.tod as tt
+
+
+---
+
+macports - package manage
+(like homebrew)
+
+get access for pytoast
+: will need mapdam for signal generate 
+
+
+
+
+
+
+
+
+
+
+
+
+
+> cd git/litebird-tools/
+> python3 setup.py develop --prefix=/global/cscratch1/sd/wlwu/software/litebird/
+( when add new python scripts, need to run the above again )
+
+Run things in $SCRATCH
+
+In kisner $SCRATCH space, litebird/tutorial
+cp gen_slrm.sh
+and templates directory
+
+then run
+> ./gen_slrm.sh templates/pointing_fp-mirror_hwp-on_16h 
+
+Change the pointing....slrm files with
+> # Point this at your own install...
+> source /global/cscratch1/sd/kisner/software/litebird/setup.sh
+
+then type (to run the slurm job)
+> sbatch pointing....slrm
+
+use 
+> sacct 
+to check the status of the job
+
+Once the .bin files are produced, run
+> lb_bin2fits --hits hits.bin --invnpp invnpp.bin
+(make sure that the setup.sh script is properly sourced so that $PATH points to 
+( > source setup.sh ) 
+
+
+
+
+
+
+
+
+
+
+
